@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WiFi Monitor — Network Control Panel</title>
-    <meta name="description" content="Dashboard untuk memantau, kick, dan ban perangkat yang terhubung ke jaringan WiFi OpenWrt kamu." />
+    <meta name="description" content="Dashboard untuk memantau, kick, dan ban perangkat yang terhubung ke jaringan WiFi kamu." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -24,40 +24,55 @@
           </svg>
         </div>
         <h2>Koneksi ke Router</h2>
-        <p class="modal-subtitle">Masukkan detail router OpenWrt / DD-WRT kamu</p>
+        <p class="modal-subtitle">Masukkan konfigurasi bridge &amp; router OpenWrt kamu</p>
 
         <form id="setup-form" autocomplete="off">
+
+          <!-- Bridge URL -->
+          <div class="form-section-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Local Bridge (jalankan dulu <code>start.bat</code>)
+          </div>
+          <div class="form-group">
+            <label for="bridge-url">Bridge URL</label>
+            <input type="text" id="bridge-url" placeholder="http://localhost:3000" value="http://localhost:3000" required />
+          </div>
+
+          <div class="form-divider"></div>
+
+          <!-- Router credentials -->
+          <div class="form-section-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M1.5 8.5C6 3.5 18 3.5 22.5 8.5"/><path d="M5 12c3.5-3.5 11-3.5 14 0"/><path d="M8.5 15.5c2-2 5-2 7 0"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg>
+            Router SSH
+          </div>
           <div class="form-group">
             <label for="router-ip">IP Address Router</label>
             <input type="text" id="router-ip" placeholder="192.168.1.1" required />
           </div>
-          <div class="form-group">
-            <label for="router-user">Username</label>
-            <input type="text" id="router-user" placeholder="root" value="root" required />
-          </div>
-          <div class="form-group">
-            <label for="router-pass">Password</label>
-            <div class="input-wrap">
-              <input type="password" id="router-pass" placeholder="••••••••" required />
-              <button type="button" class="eye-btn" id="toggle-pass-btn" aria-label="Tampilkan password">
-                <svg id="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-                <svg id="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
-                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
-                  <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
-                  <line x1="1" y1="1" x2="23" y2="23"/>
-                </svg>
-              </button>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="router-user">Username</label>
+              <input type="text" id="router-user" placeholder="root" value="root" required />
+            </div>
+            <div class="form-group">
+              <label for="router-pass">Password</label>
+              <div class="input-wrap">
+                <input type="password" id="router-pass" placeholder="••••••••" required />
+                <button type="button" class="eye-btn" id="toggle-pass-btn" aria-label="Tampilkan password">
+                  <svg id="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg id="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                </button>
+              </div>
             </div>
           </div>
+
           <div class="form-check">
             <input type="checkbox" id="save-creds" />
-            <label for="save-creds">Simpan di browser (localStorage)</label>
+            <label for="save-creds">Simpan konfigurasi di browser (localStorage)</label>
           </div>
+
           <button type="submit" class="btn btn-primary btn-full" id="connect-btn">
-            <span class="btn-text">Hubungkan ke Router</span>
+            <span class="btn-text">Hubungkan</span>
             <span class="spinner hidden" id="connect-spinner"></span>
           </button>
           <p class="form-error hidden" id="connect-error"></p>
@@ -65,7 +80,7 @@
 
         <div class="modal-note">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          Butuh LuCI aktif di router &amp; plugin <code>rpcd-mod-rpc-sys</code>
+          Jalankan <code>bridge/start.bat</code> di PC kamu sebelum menghubungkan
         </div>
       </div>
     </div>

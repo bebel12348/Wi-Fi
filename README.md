@@ -1,100 +1,62 @@
-# 📡 WiFi Monitor
+# side-channel-weakmap <sup>[![Version Badge][npm-version-svg]][package-url]</sup>
 
-Dashboard untuk memantau, kick, dan ban perangkat yang terhubung ke WiFi — berbasis OpenWrt/DD-WRT.
+[![github actions][actions-image]][actions-url]
+[![coverage][codecov-image]][codecov-url]
+[![License][license-image]][license-url]
+[![Downloads][downloads-image]][downloads-url]
 
-**Demo live di GitHub Pages** → tidak butuh server, langsung jalan di browser!
+[![npm badge][npm-badge-png]][package-url]
 
----
+Store information about any JS value in a side channel. Uses WeakMap if available.
 
-## 🚀 Deploy ke GitHub Pages
+Warning: this implementation will leak memory until you `delete` the `key`.
+Use [`side-channel`](https://npmjs.com/side-channel) for the best available strategy.
 
-1. **Fork / clone repo ini**
-2. Pergi ke **Settings → Pages**
-3. Source: **Deploy from a branch**, pilih `main` branch, folder `/` (root)
-4. Simpan → tunggu beberapa menit
-5. Buka `https://<username>.github.io/<repo-name>/`
+## Getting started
 
----
-
-## ⚙️ Konfigurasi Router OpenWrt
-
-### 1. Aktifkan LuCI (biasanya sudah aktif)
-```bash
-opkg update
-opkg install luci
+```sh
+npm install --save side-channel-weakmap
 ```
 
-### 2. Install plugin rpcd-mod-rpc-sys (untuk fitur exec)
-```bash
-opkg install rpcd-mod-rpc-sys
-/etc/init.d/rpcd restart
+## Usage/Examples
+
+```js
+const assert = require('assert');
+const getSideChannelList = require('side-channel-weakmap');
+
+const channel = getSideChannelList();
+
+const key = {};
+assert.equal(channel.has(key), false);
+assert.throws(() => channel.assert(key), TypeError);
+
+channel.set(key, 42);
+
+channel.assert(key); // does not throw
+assert.equal(channel.has(key), true);
+assert.equal(channel.get(key), 42);
+
+channel.delete(key);
+assert.equal(channel.has(key), false);
+assert.throws(() => channel.assert(key), TypeError);
 ```
 
-### 3. Aktifkan CORS di uhttpd (agar browser bisa akses dari GitHub Pages)
+## Tests
 
-Edit `/etc/config/uhttpd`:
-```bash
-uci set uhttpd.main.cors_allow_origin='*'
-uci commit uhttpd
-/etc/init.d/uhttpd restart
-```
+Clone the repo, `npm install`, and run `npm test`
 
-Atau via SSH:
-```bash
-uci set uhttpd.main.cors_allow_origin='*' && uci commit uhttpd && /etc/init.d/uhttpd restart
-```
-
----
-
-## 🛠️ Cara Pakai
-
-1. Buka website (GitHub Pages atau `index.html` langsung di browser)
-2. Masukkan:
-   - **IP Router**: biasanya `192.168.1.1`
-   - **Username**: `root`
-   - **Password**: password router kamu
-3. Klik **Hubungkan ke Router**
-4. Dashboard akan menampilkan semua perangkat yang terhubung
-5. Klik **⚡ Kick** untuk memutus koneksi sementara
-6. Klik **🚫 Ban** untuk memblokir permanen via firewall
-7. Tab **Daftar Ban** untuk melihat & unban perangkat
-
----
-
-## 🔧 Fitur
-
-| Fitur | Keterangan |
-|-------|------------|
-| 📡 Live Monitor | Daftar semua perangkat, auto-refresh 10 detik |
-| ⚡ Kick | Putus koneksi sementara via `hostapd_cli deauthenticate` |
-| 🚫 Ban | Block MAC address via `ebtables` / `iptables` |
-| ✅ Unban | Hapus rule firewall, perangkat bisa konek lagi |
-| 🔍 Search | Cari berdasarkan IP, MAC, atau nama perangkat |
-| 💾 Simpan Kredensial | Opsional simpan di `localStorage` browser |
-| 🌙 Dark Mode | UI premium glassmorphism |
-
----
-
-## ⚠️ Catatan Penting
-
-- **CORS**: Browser perlu izin dari router untuk akses lintas domain. Aktifkan CORS di uhttpd (lihat di atas), atau buka `index.html` secara lokal (`file://`) untuk bypass CORS.
-- **Keamanan**: Jangan gunakan password router yang lemah. Dashboard ini tidak mengenkripsi password saat dikirim (HTTP biasa).
-- **Ban list** disimpan di `localStorage` browser — jika kamu buka di browser lain, list ban tidak akan muncul (tapi rule firewall di router tetap aktif).
-
----
-
-## 📁 Struktur File
-
-```
-wifi-monitor/
-├── index.html   # UI dashboard
-├── style.css    # Styling dark glassmorphism
-├── app.js       # Logic + LuCI RPC API client
-└── README.md    # Dokumentasi ini
-```
-
----
-
-## 🤝 Lisensi
-
-MIT — bebas digunakan dan dimodifikasi.
+[package-url]: https://npmjs.org/package/side-channel-weakmap
+[npm-version-svg]: https://versionbadg.es/ljharb/side-channel-weakmap.svg
+[deps-svg]: https://david-dm.org/ljharb/side-channel-weakmap.svg
+[deps-url]: https://david-dm.org/ljharb/side-channel-weakmap
+[dev-deps-svg]: https://david-dm.org/ljharb/side-channel-weakmap/dev-status.svg
+[dev-deps-url]: https://david-dm.org/ljharb/side-channel-weakmap#info=devDependencies
+[npm-badge-png]: https://nodei.co/npm/side-channel-weakmap.png?downloads=true&stars=true
+[license-image]: https://img.shields.io/npm/l/side-channel-weakmap.svg
+[license-url]: LICENSE
+[downloads-image]: https://img.shields.io/npm/dm/side-channel-weakmap.svg
+[downloads-url]: https://npm-stat.com/charts.html?package=side-channel-weakmap
+[codecov-image]: https://codecov.io/gh/ljharb/side-channel-weakmap/branch/main/graphs/badge.svg
+[codecov-url]: https://app.codecov.io/gh/ljharb/side-channel-weakmap/
+[actions-image]: https://img.shields.io/endpoint?url=https://github-actions-badge-u3jn4tfpocch.runkit.sh/ljharb/side-channel-weakmap
+[actions-url]: https://github.com/ljharb/side-channel-weakmap/actions
