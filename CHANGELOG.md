@@ -5,24 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v1.0.2](https://github.com/ljharb/side-channel-weakmap/compare/v1.0.1...v1.0.2) - 2024-12-10
+## [v1.1.2](https://github.com/es-shims/es-object-atoms/compare/v1.1.1...v1.1.2) - 2026-05-22
 
 ### Commits
 
-- [types] fix generics ordering [`1b62e94`](https://github.com/ljharb/side-channel-weakmap/commit/1b62e94a2ad6ed30b640ba73c4a2535836c67289)
+- [Dev Deps] update `@ljharb/eslint-config`, `@ljharb/tsconfig`, `auto-changelog`, `eslint`, `npmignore` [`41e3d94`](https://github.com/es-shims/es-object-atoms/commit/41e3d94f6b49237fa490ec598e068f170c8b161e)
+- [types] improve `isObject` type [`758edc2`](https://github.com/es-shims/es-object-atoms/commit/758edc2280fa6993a294a55957a43cee5951bf51)
 
-## [v1.0.1](https://github.com/ljharb/side-channel-weakmap/compare/v1.0.0...v1.0.1) - 2024-12-10
-
-### Commits
-
-- [types] fix generics ordering [`08a4a5d`](https://github.com/ljharb/side-channel-weakmap/commit/08a4a5dbffedc3ebc79f1aaaf5a3dd6d2196dc1b)
-- [Deps] update `side-channel-map` [`b53fe44`](https://github.com/ljharb/side-channel-weakmap/commit/b53fe447dfdd3a9aebedfd015b384eac17fce916)
-
-## v1.0.0 - 2024-12-10
+## [v1.1.1](https://github.com/es-shims/es-object-atoms/compare/v1.1.0...v1.1.1) - 2025-01-14
 
 ### Commits
 
-- Initial implementation, tests, readme, types [`53c0fa4`](https://github.com/ljharb/side-channel-weakmap/commit/53c0fa4788435a006f58b9d7b43cb65989ecee49)
-- Initial commit [`a157947`](https://github.com/ljharb/side-channel-weakmap/commit/a157947f26fcaf2c4a941d3a044e76bf67343532)
-- npm init [`54dfc55`](https://github.com/ljharb/side-channel-weakmap/commit/54dfc55bafb16265910d5aad4e743c43aee5bbbb)
-- Only apps should have lockfiles [`0ddd6c7`](https://github.com/ljharb/side-channel-weakmap/commit/0ddd6c7b07fe8ee04d67b2e9f7255af7ce62c07d)
+- [types] `ToObject`: improve types [`cfe8c8a`](https://github.com/es-shims/es-object-atoms/commit/cfe8c8a105c44820cb22e26f62d12ef0ad9715c8)
+
+## [v1.1.0](https://github.com/es-shims/es-object-atoms/compare/v1.0.1...v1.1.0) - 2025-01-14
+
+### Commits
+
+- [New] add `isObject` [`51e4042`](https://github.com/es-shims/es-object-atoms/commit/51e4042df722eb3165f40dc5f4bf33d0197ecb07)
+
+## [v1.0.1](https://github.com/es-shims/es-object-atoms/compare/v1.0.0...v1.0.1) - 2025-01-13
+
+### Commits
+
+- [Dev Deps] update `@ljharb/eslint-config`, `@ljharb/tsconfig`, `@types/tape`, `auto-changelog`, `tape` [`38ab9eb`](https://github.com/es-shims/es-object-atoms/commit/38ab9eb00b62c2f4668644f5e513d9b414ebd595)
+- [types] improve types [`7d1beb8`](https://github.com/es-shims/es-object-atoms/commit/7d1beb887958b78b6a728a210a1c8370ab7e2aa1)
+- [Tests] replace `aud` with `npm audit` [`25863ba`](https://github.com/es-shims/es-object-atoms/commit/25863baf99178f1d1ad33d1120498db28631907e)
+- [Dev Deps] add missing peer dep [`c012309`](https://github.com/es-shims/es-object-atoms/commit/c0123091287e6132d6f4240496340c427433df28)
+
+## v1.0.0 - 2024-03-16
+
+### Commits
+
+- Initial implementation, tests, readme, types [`f1499db`](https://github.com/es-shims/es-object-atoms/commit/f1499db7d3e1741e64979c61d645ab3137705e82)
+- Initial commit [`99eedc7`](https://github.com/es-shims/es-object-atoms/commit/99eedc7b5fde38a50a28d3c8b724706e3e4c5f6a)
+- [meta] rename repo [`fc851fa`](https://github.com/es-shims/es-object-atoms/commit/fc851fa70616d2d182aaf0bd02c2ed7084dea8fa)
+- npm init [`b909377`](https://github.com/es-shims/es-object-atoms/commit/b909377c50049bd0ec575562d20b0f9ebae8947f)
+- Only apps should have lockfiles [`7249edd`](https://github.com/es-shims/es-object-atoms/commit/7249edd2178c1b9ddfc66ffcc6d07fdf0d28efc1)
