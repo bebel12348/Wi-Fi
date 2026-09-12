@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WiFi Monitor — Network Control Panel</title>
+    <meta name="description" content="Dashboard untuk memantau, kick, dan ban perangkat yang terhubung ke jaringan WiFi OpenWrt kamu." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+
+    <!-- ══ Setup Modal ══════════════════════════════════════════════ -->
+    <div id="setup-overlay" class="overlay active">
+      <div class="modal glass" id="setup-modal">
+        <div class="modal-icon pulse-glow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M1.5 8.5C6 3.5 18 3.5 22.5 8.5"/>
+            <path d="M5 12c3.5-3.5 11-3.5 14 0"/>
+            <path d="M8.5 15.5c2-2 5-2 7 0"/>
+            <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <h2>Koneksi ke Router</h2>
+        <p class="modal-subtitle">Masukkan detail router OpenWrt / DD-WRT kamu</p>
+
+        <form id="setup-form" autocomplete="off">
+          <div class="form-group">
+            <label for="router-ip">IP Address Router</label>
+            <input type="text" id="router-ip" placeholder="192.168.1.1" required />
+          </div>
+          <div class="form-group">
+            <label for="router-user">Username</label>
+            <input type="text" id="router-user" placeholder="root" value="root" required />
+          </div>
+          <div class="form-group">
+            <label for="router-pass">Password</label>
+            <div class="input-wrap">
+              <input type="password" id="router-pass" placeholder="••••••••" required />
+              <button type="button" class="eye-btn" id="toggle-pass-btn" aria-label="Tampilkan password">
+                <svg id="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg id="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+                  <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="save-creds" />
+            <label for="save-creds">Simpan di browser (localStorage)</label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" id="connect-btn">
+            <span class="btn-text">Hubungkan ke Router</span>
+            <span class="spinner hidden" id="connect-spinner"></span>
+          </button>
+          <p class="form-error hidden" id="connect-error"></p>
+        </form>
+
+        <div class="modal-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Butuh LuCI aktif di router &amp; plugin <code>rpcd-mod-rpc-sys</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Confirm Modal ════════════════════════════════════════════ -->
+    <div id="confirm-overlay" class="overlay">
+      <div class="modal glass small" id="confirm-modal">
+        <div class="modal-icon" id="confirm-icon"></div>
+        <h3 id="confirm-title">Konfirmasi</h3>
+        <p id="confirm-desc" class="modal-subtitle"></p>
+        <div class="confirm-device" id="confirm-device"></div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="confirm-cancel">Batal</button>
+          <button class="btn btn-danger" id="confirm-ok">Ya, Lanjutkan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Main App ══════════════════════════════════════════════════ -->
+    <div class="app hidden" id="main-app">
+
+      <!-- Header -->
+      <header class="header glass">
+        <div class="header-left">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M1.5 8.5C6 3.5 18 3.5 22.5 8.5"/>
+              <path d="M5 12c3.5-3.5 11-3.5 14 0"/>
+              <path d="M8.5 15.5c2-2 5-2 7 0"/>
+              <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="brand-name">WiFi Monitor</h1>
+            <span class="brand-sub">Network Control Panel</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="status-badge" id="status-badge">
+            <span class="status-dot" id="status-dot"></span>
+            <span id="router-addr-display">—</span>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="settings-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M5.34 5.34 3.93 3.93M12 20v2M12 2v2"/>
+            </svg>
+            Pengaturan
+          </button>
+          <button class="btn btn-icon" id="refresh-btn" title="Refresh manual">
+            <svg id="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+          </button>
+          <div class="countdown-wrap">
+            <svg class="countdown-ring" viewBox="0 0 36 36">
+              <circle class="ring-bg" cx="18" cy="18" r="15.9"/>
+              <circle class="ring-fill" id="countdown-ring" cx="18" cy="18" r="15.9"/>
+            </svg>
+            <span class="countdown-label" id="countdown-label">10</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-card glass">
+          <div class="stat-num" id="stat-total">—</div>
+          <div class="stat-lbl">Total Perangkat</div>
+        </div>
+        <div class="stat-card glass">
+          <div class="stat-num green" id="stat-active">—</div>
+          <div class="stat-lbl">Aktif</div>
+        </div>
+        <div class="stat-card glass">
+          <div class="stat-num red" id="stat-banned">—</div>
+          <div class="stat-lbl">Di-Ban</div>
+        </div>
+        <div class="stat-card glass">
+          <div class="stat-num small" id="stat-refreshed">—</div>
+          <div class="stat-lbl">Terakhir Update</div>
+        </div>
+      </div>
+
+      <!-- Tabs + Search -->
+      <div class="controls-bar">
+        <div class="tabs">
+          <button class="tab active" data-tab="devices" id="tab-devices">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            Terhubung
+            <span class="tab-count" id="count-devices">0</span>
+          </button>
+          <button class="tab" data-tab="banned" id="tab-banned">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+            </svg>
+            Daftar Ban
+            <span class="tab-count red" id="count-banned">0</span>
+          </button>
+        </div>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-ico">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="search-input" placeholder="Cari IP, MAC, atau nama…" />
+        </div>
+      </div>
+
+      <!-- Devices Tab -->
+      <div class="tab-panel active" id="panel-devices">
+        <div class="table-card glass">
+          <table>
+            <thead>
+              <tr>
+                <th>Perangkat</th>
+                <th>IP Address</th>
+                <th>MAC Address</th>
+                <th>Sumber</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="devices-tbody">
+              <tr><td colspan="6" class="empty-cell"><div class="empty-state"><span class="empty-ico">📡</span><span>Menunggu data...</span></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Banned Tab -->
+      <div class="tab-panel" id="panel-banned">
+        <div class="table-card glass">
+          <table>
+            <thead>
+              <tr>
+                <th>Perangkat</th>
+                <th>IP Terakhir</th>
+                <th>MAC Address</th>
+                <th>Waktu Ban</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="banned-tbody">
+              <tr><td colspan="5" class="empty-cell"><div class="empty-state"><span class="empty-ico">✅</span><span>Tidak ada perangkat yang di-ban</span></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /app -->
+
+    <!-- Toast Container -->
+    <div id="toasts"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
